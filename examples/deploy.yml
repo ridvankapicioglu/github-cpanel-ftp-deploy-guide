@@ -1,0 +1,176 @@
+```yaml
+name: Deploy to cPanel via FTP
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  ftp-deploy:
+    name: Deploy via FTP
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Deploy Files
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          # GitHub Secrets
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+
+          # FTP hesabı doğrudan hedef klasöre bağlıysa "/"
+          local-dir: ./
+          server-dir: /
+
+          # İlk kurulumda test amaçlı açılabilir
+          # dry-run: true
+
+          protocol: ftps
+          port: 21
+
+          exclude: |
+
+            ####################################################################
+            # GIT DOSYALARI
+            ####################################################################
+
+            **/.git*
+            **/.git*/**
+            **/.github/**
+
+            ####################################################################
+            # IDE / EDITOR DOSYALARI
+            ####################################################################
+
+            **/.vscode/**
+            **/.idea/**
+            **/*.iml
+
+            ####################################################################
+            # CLAUDE / AI DOSYALARI
+            ####################################################################
+
+            **/.claude/**
+            **/CLAUDE.md
+
+            ####################################################################
+            # ENVIRONMENT DOSYALARI
+            ####################################################################
+
+            # Sunucudaki .env dosyasının üzerine yazılmasını engeller
+            **/.env
+
+            # .env.production
+            # .env.local
+            # .env.staging
+            **/.env.*
+
+            # Sadece örnek env dosyası gönderilsin
+            !**/.env.example
+
+            ####################################################################
+            # PACKAGE / DEPENDENCY KLASÖRLERİ
+            ####################################################################
+
+            # Composer paketleri
+            **/vendor/**
+
+            # NPM paketleri
+            **/node_modules/**
+
+            ####################################################################
+            # KULLANICI TARAFINDAN YÜKLENEN DOSYALAR
+            ####################################################################
+
+            # Laravel upload klasörü
+            **/public/uploads/**
+
+            # APK dağıtım klasörü
+            **/public/apk/**
+
+            # Genel upload klasörleri
+            **/uploads/**
+            **/upload/**
+            **/files/**
+            **/storage/app/public/**
+
+            ####################################################################
+            # APK / ZIP / ARŞİV DOSYALARI
+            ####################################################################
+
+            **/*.apk
+            **/*.aab
+
+            **/*.zip
+            **/*.rar
+            **/*.7z
+            **/*.tar
+            **/*.gz
+
+            ####################################################################
+            # LOG DOSYALARI
+            ####################################################################
+
+            **/*.log
+
+            **/storage/logs/**
+
+            ####################################################################
+            # LARAVEL CACHE DOSYALARI
+            ####################################################################
+
+            **/storage/framework/cache/**
+            **/storage/framework/sessions/**
+            **/storage/framework/testing/**
+            **/storage/framework/views/**
+
+            ####################################################################
+            # BOOTSTRAP CACHE
+            ####################################################################
+
+            **/bootstrap/cache/*.php
+
+            ####################################################################
+            # TEST DOSYALARI
+            ####################################################################
+
+            **/tests/**
+            **/phpunit.xml
+
+            ####################################################################
+            # MACOS DOSYALARI
+            ####################################################################
+
+            **/__MACOSX/**
+            **/.DS_Store
+
+            ####################################################################
+            # WINDOWS DOSYALARI
+            ####################################################################
+
+            **/Thumbs.db
+            **/desktop.ini
+
+            ####################################################################
+            # NODE / NPM LOG DOSYALARI
+            ####################################################################
+
+            **/npm-debug.log
+            **/yarn-error.log
+            **/pnpm-debug.log
+
+            ####################################################################
+            # DERLEME ÇIKTILARI
+            ####################################################################
+
+            **/build/**
+            **/dist/**
+            **/.dart_tool/**
+            **/.next/**
+            **/.nuxt/**
+```
